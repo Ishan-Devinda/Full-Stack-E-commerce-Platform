@@ -1,0 +1,592 @@
+/* src/app/globals.css */
+@import "tailwindcss";
+
+/* ========================================
+   BASE STYLES
+   ======================================== */
+/* * {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  transition: background-color 0.3s ease, color 0.3s ease;
+} */
+
+/* ========================================
+   THEME VARIABLES
+   ======================================== */
+
+/* Light Mode (Default) */
+:root,
+.light {
+  --bg-primary: #ffffff;
+  --bg-secondary: #f9fafb;
+  --bg-tertiary: #f3f4f6;
+
+  --text-primary: #111827;
+  --text-secondary: #4b5563;
+  --text-tertiary: #6b7280;
+
+  --border-primary: #e5e7eb;
+  --border-secondary: #d1d5db;
+
+  --shadow-color: rgba(0, 0, 0, 0.1);
+}
+
+/* Dark Mode */
+.dark {
+  --bg-primary: #111827;
+  --bg-secondary: #1f2937;
+  --bg-tertiary: #374151;
+
+  --text-primary: #ffffff;
+  --text-secondary: #d1d5db;
+  --text-tertiary: #9ca3af;
+
+  --border-primary: #374151;
+  --border-secondary: #4b5563;
+
+  --shadow-color: rgba(0, 0, 0, 0.3);
+}
+
+/* ========================================
+   ANT DESIGN CUSTOMIZATION
+   ======================================== */
+
+/* Card Styles */
+.ant-card {
+  box-shadow: 0 4px 20px var(--shadow-color);
+  border-radius: 1rem;
+  transition: all 0.3s ease;
+}
+
+.dark .ant-card {
+  background-color: var(--bg-secondary);
+  border-color: var(--border-primary);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+.dark .ant-card-head {
+  background-color: var(--bg-secondary);
+  border-bottom-color: var(--border-primary);
+  color: var(--text-primary);
+}
+
+.dark .ant-card-head-title {
+  color: var(--text-primary);
+}
+
+/* Primary Button Gradient */
+.ant-btn-primary {
+  background: linear-gradient(90deg, #f97316 0%, #ec4899 50%, #f43f5e 100%);
+  border: none;
+  color: #fff;
+  font-weight: 600;
+  transition: all 0.3s;
+}
+
+.ant-btn-primary:hover,
+.ant-btn-primary:focus {
+  transform: scale(1.02);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  background: linear-gradient(90deg, #f97316 0%, #ec4899 50%, #f43f5e 100%);
+  opacity: 0.9;
+}
+
+.ant-btn-primary:disabled {
+  background: linear-gradient(90deg, #f97316 0%, #ec4899 50%, #f43f5e 100%);
+  opacity: 0.5;
+}
+
+/* Default Button in Dark Mode */
+.dark .ant-btn:not(.ant-btn-primary):not(.ant-btn-link) {
+  background-color: var(--bg-tertiary);
+  border-color: var(--border-secondary);
+  color: var(--text-primary);
+}
+
+.dark .ant-btn:not(.ant-btn-primary):not(.ant-btn-link):hover {
+  background-color: var(--border-secondary);
+  border-color: #6b7280;
+  color: var(--text-primary);
+}
+
+/* Steps Active / Process Icon */
+.ant-steps-item-process .ant-steps-item-icon {
+  background: linear-gradient(90deg, #f97316 0%, #ec4899 50%, #f43f5e 100%);
+  border: none;
+}
+
+/* Steps Finish Icon */
+.ant-steps-item-finish .ant-steps-item-icon {
+  background: linear-gradient(90deg, #f97316 0%, #ec4899 50%, #f43f5e 100%);
+  border: none;
+}
+
+/* Steps Finish Icon Inner Color */
+.ant-steps-item-finish .ant-steps-item-icon > .ant-steps-icon {
+  color: #fff;
+}
+
+/* Dark Mode Steps */
+.dark .ant-steps-item-title,
+.dark .ant-steps-item-description {
+  color: var(--text-secondary);
+}
+
+.dark .ant-steps-item-wait .ant-steps-item-icon {
+  background-color: var(--bg-tertiary);
+  border-color: var(--border-secondary);
+}
+
+.dark .ant-steps-item-wait .ant-steps-item-icon > .ant-steps-icon {
+  color: var(--text-tertiary);
+}
+
+/* ========================================
+   FORM INPUTS - DARK MODE
+   ======================================== */
+
+/* Input Fields */
+.dark .ant-input,
+.dark .ant-input-affix-wrapper,
+.dark .ant-input-number,
+.dark .ant-picker {
+  background-color: var(--bg-tertiary) !important;
+  border-color: var(--border-secondary) !important;
+  color: var(--text-primary) !important;
+}
+
+.dark .ant-input::placeholder,
+.dark .ant-input-affix-wrapper input::placeholder {
+  color: var(--text-tertiary);
+}
+
+.dark .ant-input:hover,
+.dark .ant-input-affix-wrapper:hover,
+.dark .ant-input-number:hover,
+.dark .ant-picker:hover {
+  border-color: #6b7280 !important;
+}
+
+.dark .ant-input:focus,
+.dark .ant-input-affix-wrapper-focused,
+.dark .ant-input-number-focused,
+.dark .ant-picker-focused {
+  border-color: #ec4899 !important;
+  box-shadow: 0 0 0 2px rgba(236, 72, 153, 0.2);
+}
+
+/* Input Prefix/Suffix Icons */
+.dark .ant-input-prefix,
+.dark .ant-input-suffix {
+  color: var(--text-tertiary);
+}
+
+/* ========================================
+   SELECT DROPDOWN - DARK MODE
+   ======================================== */
+
+.dark .ant-select-selector {
+  background-color: var(--bg-tertiary) !important;
+  border-color: var(--border-secondary) !important;
+  color: var(--text-primary) !important;
+}
+
+.dark .ant-select-arrow {
+  color: var(--text-tertiary);
+}
+
+.dark .ant-select-dropdown {
+  background-color: var(--bg-secondary);
+  border-color: var(--border-primary);
+}
+
+.dark .ant-select-item {
+  color: var(--text-secondary);
+}
+
+.dark .ant-select-item-option-selected {
+  background-color: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+.dark .ant-select-item:hover {
+  background-color: var(--bg-tertiary);
+}
+
+/* ========================================
+   MODAL - DARK MODE
+   ======================================== */
+
+.dark .ant-modal-content {
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.dark .ant-modal-header {
+  background-color: var(--bg-secondary);
+  border-bottom-color: var(--border-primary);
+}
+
+.dark .ant-modal-title {
+  color: var(--text-primary);
+}
+
+.dark .ant-modal-close {
+  color: var(--text-tertiary);
+}
+
+.dark .ant-modal-close:hover {
+  color: var(--text-primary);
+}
+
+.dark .ant-modal-footer {
+  border-top-color: var(--border-primary);
+}
+
+/* ========================================
+   TABLE - DARK MODE
+   ======================================== */
+
+.dark .ant-table {
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.dark .ant-table-thead > tr > th {
+  background-color: var(--bg-tertiary);
+  color: var(--text-primary);
+  border-bottom-color: var(--border-secondary);
+}
+
+.dark .ant-table-tbody > tr > td {
+  border-bottom-color: var(--border-primary);
+  color: var(--text-secondary);
+}
+
+.dark .ant-table-tbody > tr:hover > td {
+  background-color: var(--bg-tertiary);
+}
+
+.dark .ant-table-pagination {
+  color: var(--text-secondary);
+}
+
+/* ========================================
+   MESSAGE & NOTIFICATION - DARK MODE
+   ======================================== */
+
+.dark .ant-message-notice-content {
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+.dark .ant-notification-notice {
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+.dark .ant-notification-notice-message {
+  color: var(--text-primary);
+}
+
+.dark .ant-notification-notice-description {
+  color: var(--text-secondary);
+}
+
+/* ========================================
+   MENU - DARK MODE
+   ======================================== */
+
+.dark .ant-menu {
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.dark .ant-menu-item,
+.dark .ant-menu-submenu-title {
+  color: var(--text-secondary);
+}
+
+.dark .ant-menu-item:hover,
+.dark .ant-menu-submenu-title:hover {
+  color: var(--text-primary);
+  background-color: var(--bg-tertiary);
+}
+
+.dark .ant-menu-item-selected {
+  background-color: var(--bg-tertiary);
+  color: #ec4899;
+}
+
+/* ========================================
+   SCROLLBAR STYLING
+   ======================================== */
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: #9ca3af;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #6b7280;
+}
+
+.dark ::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: var(--border-secondary);
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #6b7280;
+}
+
+/* ========================================
+   SMOOTH TRANSITIONS
+   ======================================== */
+
+* {
+  transition-property: background-color, border-color, color, fill, stroke,
+    opacity, box-shadow, transform;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+/* Disable transitions on theme change for immediate update */
+.theme-transitioning * {
+  transition: none !important;
+}
+
+/* ========================================
+   UTILITY CLASSES
+   ======================================== */
+
+.gradient-text {
+  background: linear-gradient(90deg, #f97316 0%, #ec4899 50%, #f43f5e 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.gradient-button {
+  background: linear-gradient(90deg, #f97316 0%, #ec4899 50%, #f43f5e 100%);
+  border: none;
+  color: white;
+  font-weight: 600;
+  transition: all 0.3s;
+}
+
+.gradient-button:hover {
+  transform: scale(1.02);
+  opacity: 0.9;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* ========================================
+   GLOBAL BACKGROUND ANIMATION
+   ======================================== */
+
+@keyframes blob {
+  0% {
+    transform: translate(0px, 0px) scale(1);
+  }
+  33% {
+    transform: translate(30px, -50px) scale(1.1);
+  }
+  66% {
+    transform: translate(-20px, 20px) scale(0.9);
+  }
+  100% {
+    transform: translate(0px, 0px) scale(1);
+  }
+}
+
+.animate-blob {
+  animation: blob 12s infinite;
+}
+
+.animation-delay-2000 {
+  animation-delay: 2s;
+}
+
+.animation-delay-4000 {
+  animation-delay: 4s;
+}
+
+/* Smooth Scroll */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Image Zoom Effect */
+.image-zoom {
+  transition: transform 0.3s ease;
+}
+
+.image-zoom:hover {
+  transform: scale(1.05);
+}
+
+/* Card Hover Shadow */
+.card-hover-shadow {
+  transition: box-shadow 0.3s ease;
+}
+
+.card-hover-shadow:hover {
+  box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1),
+    0 8px 10px -6px rgb(0 0 0 / 0.1);
+}
+
+/* Custom Ant Design Overrides */
+.ant-rate-star {
+  font-size: 16px !important;
+}
+
+.ant-tabs-nav {
+  margin-bottom: 24px !important;
+}
+
+.ant-tabs-tab {
+  font-size: 16px !important;
+  font-weight: 500 !important;
+  padding: 12px 20px !important;
+}
+
+/* Product Card Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.product-card-animate {
+  animation: fadeInUp 0.5s ease-out;
+}
+
+/* Badge Pulse Effect */
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.badge-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Quick View Overlay Animation */
+.quick-view-overlay {
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Price Highlight */
+.price-highlight {
+  position: relative;
+  display: inline-block;
+}
+
+.price-highlight::after {
+  content: "";
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+  border-radius: 2px;
+}
+
+/* Loading Skeleton */
+.skeleton-loading {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s ease-in-out infinite;
+}
+
+@keyframes loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Responsive Typography */
+@media (max-width: 768px) {
+  h1 {
+    font-size: 1.75rem !important;
+  }
+
+  h2 {
+    font-size: 1.5rem !important;
+  }
+
+  h3 {
+    font-size: 1.25rem !important;
+  }
+}
+
+/* Button Hover Effects */
+.btn-primary-hover {
+  transition: all 0.3s ease;
+}
+
+.btn-primary-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+}
+
+/* Tag Animations */
+.tag-bounce {
+  animation: bounce 1s infinite;
+}
+
+@keyframes bounce {
+  0%,
+  100% {
+    transform: translateY(-2px);
+  }
+  50% {
+    transform: translateY(0);
+  }
+}
