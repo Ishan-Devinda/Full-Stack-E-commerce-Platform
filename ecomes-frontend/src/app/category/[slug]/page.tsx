@@ -410,16 +410,16 @@ export default function CategoryPage({
                     <ProductCard
                       id={product._id}
                       name={product.name}
-                      image={product.images?.[0] || "/products/placeholder.jpg"}
-                      price={product.price}
-                      originalPrice={product.originalPrice}
-                      rating={product.rating}
+                      image={product.images[0] || "/products/placeholder.jpg"}
+                      priceUSD={product.salePrice || product.basePrice}
+                      originalPriceUSD={product.basePrice}
+                      rating={product.averageRating}
                       reviewCount={product.reviewCount}
-                      discount={product.discount}
-                      inStock={product.inStock}
+                      discount={product.offers?.discountPercentage}
+                      inStock={product.stock > 0}
                       isNew={product.isNew}
                       isBestSeller={product.isBestSeller}
-                      currency="USD"
+
                       onAddToCart={handleAddToCart}
                       onAddToWishlist={handleAddToWishlist}
                     />

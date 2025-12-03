@@ -310,21 +310,49 @@ class UserController {
     try {
       const user = await User.findById(req.user._id).populate(
         "cart.items.productId",
-        "name price images stock"
+        "name salePrice basePrice images stock offers"
       );
 
-      // Calculate total amount
+      // Calculate prices with discounts
       let totalAmount = 0;
-      user.cart.items.forEach((item) => {
-        if (item.productId && item.productId.price) {
-          totalAmount += item.productId.price * item.quantity;
+      const cartWithPrices = user.cart.items.map((item) => {
+        if (!item.productId) return null;
+
+        // Calculate unit price (salePrice or basePrice)
+        const unitPrice = item.productId.salePrice || item.productId.basePrice;
+
+        // Validate price - skip items with invalid prices
+        if (!unitPrice || unitPrice <= 0) {
+          console.warn(`Product ${item.productId.name} has invalid price, skipping from cart`);
+          return null;
         }
-      });
+
+        // Apply discount if offers exist
+        let finalPrice = unitPrice;
+        if (item.productId.offers && item.productId.offers.discountPercentage > 0) {
+          const discount = (unitPrice * item.productId.offers.discountPercentage) / 100;
+          finalPrice = unitPrice - discount;
+        }
+
+        const itemTotal = finalPrice * item.quantity;
+        totalAmount += itemTotal;
+
+        return {
+          ...item.toObject(),
+          unitPrice: finalPrice,
+          originalPrice: unitPrice,
+          total: itemTotal,
+          discount: item.productId.offers?.discountPercentage || 0
+        };
+      }).filter(Boolean);
 
       res.json({
         success: true,
         data: {
-          cart: user.cart,
+          cart: {
+            ...user.cart.toObject(),
+            items: cartWithPrices
+          },
           totalAmount: totalAmount,
         },
       });

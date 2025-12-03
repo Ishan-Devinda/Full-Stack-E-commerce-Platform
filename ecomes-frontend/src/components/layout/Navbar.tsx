@@ -33,8 +33,8 @@ export default function Navbar() {
 
   const filteredSuggestions = searchQuery
     ? searchSuggestions.filter((s) =>
-        s.toLowerCase().includes(searchQuery.toLowerCase())
-      )
+      s.toLowerCase().includes(searchQuery.toLowerCase())
+    )
     : [];
 
   return (
@@ -44,12 +44,14 @@ export default function Navbar() {
       <div className="max-w-400 mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <div className="flex items-center cursor-pointer">
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-orange-500 via-pink-500 to-rose-500 bg-clip-text text-transparent">
-              DEV SHOP
-            </h1>
-            <ShoppingCart className="ml-1 h-6 w-6 text-orange-500" />
-          </div>
+          <Link href={"/"}>
+            <div className="flex items-center cursor-pointer">
+              <h1 className="text-2xl font-bold bg-gradient-to-r from-orange-500 via-pink-500 to-rose-500 bg-clip-text text-transparent">
+                DEV SHOP
+              </h1>
+              <ShoppingCart className="ml-1 h-6 w-6 text-orange-500" />
+            </div>
+          </Link>
 
           {/* Search Bar */}
           <div className="flex-1 max-w-2xl mx-8 relative">
@@ -159,14 +161,12 @@ export default function Navbar() {
                       </div>
                       {/* Toggle Switch */}
                       <div
-                        className={`w-12 h-6 ${
-                          theme === "dark" ? "bg-pink-500" : "bg-gray-300"
-                        } rounded-full relative transition-colors`}
+                        className={`w-12 h-6 ${theme === "dark" ? "bg-pink-500" : "bg-gray-300"
+                          } rounded-full relative transition-colors`}
                       >
                         <div
-                          className={`absolute top-1 ${
-                            theme === "dark" ? "right-1" : "left-1"
-                          } w-4 h-4 bg-white rounded-full transition-all`}
+                          className={`absolute top-1 ${theme === "dark" ? "right-1" : "left-1"
+                            } w-4 h-4 bg-white rounded-full transition-all`}
                         />
                       </div>
                     </button>

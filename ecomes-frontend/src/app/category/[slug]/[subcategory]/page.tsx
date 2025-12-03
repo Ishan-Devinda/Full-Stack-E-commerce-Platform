@@ -67,11 +67,10 @@ export default function SubCategoryPage({
   // ============================
   const FilterSidebar = ({ isMobile = false }: { isMobile?: boolean }) => (
     <div
-      className={`${
-        isMobile
+      className={`${isMobile
           ? "fixed inset-0 z-50 bg-white overflow-y-auto"
           : "sticky top-4"
-      } bg-white rounded-2xl p-6 shadow-sm border border-gray-200`}
+        } bg-white rounded-2xl p-6 shadow-sm border border-gray-200`}
     >
       {/* Mobile Header */}
       {isMobile && (
@@ -241,16 +240,16 @@ export default function SubCategoryPage({
                     <ProductCard
                       id={product._id}
                       name={product.name}
-                      image={product.images?.[0] || "/products/placeholder.jpg"}
-                      price={product.price}
-                      originalPrice={product.originalPrice}
-                      rating={product.rating}
+                      image={product.images[0] || "/products/placeholder.jpg"}
+                      priceUSD={product.salePrice || product.basePrice}
+                      originalPriceUSD={product.basePrice}
+                      rating={product.averageRating}
                       reviewCount={product.reviewCount}
-                      discount={product.discount}
-                      inStock={product.inStock}
+                      discount={product.offers?.discountPercentage}
+                      inStock={product.stock > 0}
                       isNew={product.isNew}
                       isBestSeller={product.isBestSeller}
-                      currency="USD"
+
                       onAddToCart={handleAddToCart}
                       onAddToWishlist={handleAddToWishlist}
                     />

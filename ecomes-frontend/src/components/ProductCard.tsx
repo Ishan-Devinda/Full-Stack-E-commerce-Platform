@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Card, Rate, Button, Tooltip, Tag } from "antd";
+import { Card, Rate, Button, Tooltip, Tag, message } from "antd";
 import {
   HeartOutlined,
   HeartFilled,
@@ -13,6 +13,7 @@ import Link from "next/link";
 import { useSettings } from "@/contexts/settingsContext";
 import { themeConfig } from "@/lib/theme";
 import { useTheme } from "@/contexts/ThemeContext";
+import { cartWishlistAPI } from "@/services/cartWishlistService";
 
 interface ProductCardProps {
   id: string;
@@ -47,20 +48,53 @@ const ProductCard: React.FC<ProductCardProps> = ({
 }) => {
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [hovered, setHovered] = useState(false);
+  const [loading, setLoading] = useState(false);
   const { formatPrice } = useSettings();
 
-  const handleWishlist = (e: React.MouseEvent) => {
+  const handleWishlist = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    setIsWishlisted(!isWishlisted);
-    onAddToWishlist?.(id);
+
+    try {
+      setLoading(true);
+
+      if (isWishlisted) {
+        await cartWishlistAPI.deleteWishlistItem(id);
+        message.success("Removed from wishlist");
+        setIsWishlisted(false);
+      } else {
+        await cartWishlistAPI.addToWishlist({ productId: id });
+        message.success("Added to wishlist");
+        setIsWishlisted(true);
+      }
+
+      onAddToWishlist?.(id);
+    } catch (error: any) {
+      console.error("Wishlist error:", error);
+      message.error(error.response?.data?.message || "Failed to update wishlist");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleAddToCart = (e: React.MouseEvent) => {
+  const handleAddToCart = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    onAddToCart?.(id);
+
+    try {
+      setLoading(true);
+      await cartWishlistAPI.addToCart({ productId: id, quantity: 1 });
+      message.success("Added to cart");
+
+      onAddToCart?.(id);
+    } catch (error: any) {
+      console.error("Add to cart error:", error);
+      message.error(error.response?.data?.message || "Failed to add to cart");
+    } finally {
+      setLoading(false);
+    }
   };
+
   const { theme } = useTheme();
   const t = themeConfig[theme];
 
@@ -84,18 +118,16 @@ const ProductCard: React.FC<ProductCardProps> = ({
               src={image}
               alt={name}
               fill
-              className={`object-cover transition-transform duration-700 ${
-                hovered ? "scale-110" : "scale-100"
-              }`}
+              className={`object-cover transition-transform duration-700 ${hovered ? "scale-110" : "scale-100"
+                }`}
             />
 
             {/* Gradient overlay on hover */}
             <div
-              className={`absolute inset-0 transition-opacity duration-700 ${
-                hovered
+              className={`absolute inset-0 transition-opacity duration-700 ${hovered
                   ? "opacity-60 bg-gradient-to-t from-black/80 via-black/40 to-transparent"
                   : "opacity-0"
-              }`}
+                }`}
             ></div>
 
             {/* Wishlist Button */}
@@ -110,6 +142,8 @@ const ProductCard: React.FC<ProductCardProps> = ({
                 <Button
                   type="text"
                   shape="circle"
+                  size="large"
+                  loading={loading}
                   icon={
                     isWishlisted ? (
                       <HeartFilled className="text-red-500 text-5xl " />
@@ -131,7 +165,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
             </div>
           </div>
         }
-        //bodyStyle={{ padding: "12px" }}
+      //bodyStyle={{ padding: "12px" }}
       >
         {/* Product Info */}
         <div className="space-y-1">
@@ -170,12 +204,12 @@ const ProductCard: React.FC<ProductCardProps> = ({
             block
             icon={<ShoppingCartOutlined />}
             disabled={!inStock}
+            loading={loading}
             onClick={handleAddToCart}
             className={`mt-3 py-2 font-semibold rounded-lg transition-all
-              ${
-                inStock
-                  ? "bg-gradient-to-r from-orange-500 via-pink-500 to-rose-500 hover:opacity-90"
-                  : "bg-gray-300 text-gray-600 cursor-not-allowed"
+              ${inStock
+                ? "bg-gradient-to-r from-orange-500 via-pink-500 to-rose-500 hover:opacity-90"
+                : "bg-gray-300 text-gray-600 cursor-not-allowed"
               }`}
           >
             {inStock ? "Add to Cart" : "Out of Stock"}

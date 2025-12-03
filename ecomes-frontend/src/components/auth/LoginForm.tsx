@@ -34,7 +34,7 @@ const LoginForm: React.FC = () => {
     try {
       await login(values);
       message.success("Login successful!");
-      window.location.href = "/dashboard";
+      window.location.href = "/";
     } catch (error) {
       const err = error as Error;
       message.error(err.message);

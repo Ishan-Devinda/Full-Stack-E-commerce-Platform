@@ -4,7 +4,6 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Layout, Card, Typography } from "antd";
 import { useAuth } from "@/hooks/useAuth";
-import Header from "@/components/layout/Header";
 
 const { Content } = Layout;
 const { Title, Text } = Typography;
@@ -33,7 +32,7 @@ export default function DashboardPage() {
 
   return (
     <Layout className="min-h-screen">
-      <Header />
+
       <Content className="p-6">
         <Card>
           <Title level={2}>Dashboard</Title>

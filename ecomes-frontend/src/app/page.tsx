@@ -121,8 +121,8 @@ export default function HomePage() {
   // Filter search suggestions
   const filteredSuggestions = searchQuery
     ? searchSuggestions.filter((s) =>
-        s.toLowerCase().includes(searchQuery.toLowerCase())
-      )
+      s.toLowerCase().includes(searchQuery.toLowerCase())
+    )
     : [];
 
   const router = useRouter();
@@ -200,7 +200,7 @@ export default function HomePage() {
 
       {/* Categories Navigation Bar */}
       <div className={`${t.navbar} transition-all duration-300`}>
-        c
+
         <div className="max-w-400 mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center space-x-8 h-12 overflow-x-auto">
             {/* All Categories Dropdown */}
@@ -305,9 +305,8 @@ export default function HomePage() {
                 <button
                   key={idx}
                   onClick={() => setCurrentSlide(idx)}
-                  className={`h-2 rounded-full transition-all ${
-                    idx === currentSlide ? "w-8 bg-white" : "w-2 bg-white/50"
-                  }`}
+                  className={`h-2 rounded-full transition-all ${idx === currentSlide ? "w-8 bg-white" : "w-2 bg-white/50"
+                    }`}
                   aria-label={`Go to slide ${idx + 1}`}
                 />
               ))}
@@ -394,15 +393,15 @@ export default function HomePage() {
                       id={product._id}
                       name={product.name}
                       image={product.images[0] || "/products/placeholder.jpg"}
-                      price={product.price}
-                      originalPrice={product.originalPrice}
-                      rating={product.rating}
+                      priceUSD={product.salePrice || product.basePrice}
+                      originalPriceUSD={product.basePrice}
+                      rating={product.averageRating}
                       reviewCount={product.reviewCount}
-                      discount={product.discount}
-                      inStock={product.inStock}
+                      discount={product.offers?.discountPercentage}
+                      inStock={product.stock > 0}
                       isNew={product.isNew}
                       isBestSeller={product.isBestSeller}
-                      currency={currency}
+
                       onAddToCart={handleAddToCart}
                       onAddToWishlist={handleAddToWishlist}
                     />
