@@ -169,6 +169,22 @@ class ProductController {
       });
     }
   }
+
+  // Get hero products with high discounts
+  async getHeroProducts(req, res) {
+    try {
+      console.log("✅ GET HERO PRODUCTS CALLED"); // Debug log
+      const { limit } = req.query;
+      const result = await productService.getHeroProducts(limit);
+      res.json(result);
+    } catch (error) {
+      console.error("Get hero products error:", error);
+      res.status(500).json({
+        success: false,
+        message: error.message || "Server error fetching hero products",
+      });
+    }
+  }
 }
 
 module.exports = new ProductController();

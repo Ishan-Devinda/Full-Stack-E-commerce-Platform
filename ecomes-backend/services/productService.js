@@ -400,6 +400,28 @@ class ProductService {
       throw new Error(`Search failed: ${error.message}`);
     }
   }
+
+  // Get hero products with high discounts (50% or more)
+  async getHeroProducts(limit = 10) {
+    try {
+      const products = await Product.find({
+        status: "active",
+        "offers.discountPercentage": { $gte: 50 },
+        "offers.isOnSale": true,
+        stock: { $gt: 0 },
+      })
+        .select("name images basePrice salePrice offers _id category brand")
+        .sort({ "offers.discountPercentage": -1 })
+        .limit(parseInt(limit));
+
+      return {
+        success: true,
+        data: products,
+      };
+    } catch (error) {
+      throw new Error(`Fetching hero products failed: ${error.message}`);
+    }
+  }
 }
 
 module.exports = new ProductService();

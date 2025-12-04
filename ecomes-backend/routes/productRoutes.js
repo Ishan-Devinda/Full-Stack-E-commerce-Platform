@@ -34,15 +34,17 @@ const handleValidationErrors = (req, res, next) => {
   next();
 };
 
-// Public routes
+// Public routes - IMPORTANT: Specific routes must come before parameterized routes
 router.get("/", (req, res) => productController.getAllProducts(req, res));
 router.get("/categories", (req, res) =>
   productController.getCategories(req, res)
 );
 router.get("/search", (req, res) => productController.searchProducts(req, res));
+router.get("/hero", (req, res) => productController.getHeroProducts(req, res));
 router.get("/slug/:slug", (req, res) =>
   productController.getProductBySlug(req, res)
 );
+// This must be last among GET routes as it's a catch-all for any ID
 router.get("/:id", (req, res) => productController.getProductById(req, res));
 
 // Protected routes (authenticated users)

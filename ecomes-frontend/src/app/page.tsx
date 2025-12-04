@@ -1,12 +1,13 @@
 // src/app/page.tsx
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useSettings } from "@/contexts/settingsContext";
 import { useCategories } from "@/hooks/useCategories";
 import { useCategoryUtils } from "@/hooks/useCategoryUtils";
 import { useProducts } from "@/hooks/useProducts";
+import { useHeroProducts } from "@/hooks/useHeroProducts";
 import { themeConfig } from "@/lib/theme";
 import {
   ShoppingCart,
@@ -101,6 +102,13 @@ export default function HomePage() {
     sortOrder: "desc",
   });
 
+  // Use hero products hook
+  const {
+    products: heroProducts,
+    loading: heroLoading,
+    error: heroError,
+  } = useHeroProducts(10);
+
   const safeProducts = Array.isArray(productsData?.products)
     ? productsData.products
     : [];
@@ -114,6 +122,17 @@ export default function HomePage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [currentSlide, setCurrentSlide] = useState(0);
   const [sortBy, setSortBy] = useState("createdAt");
+
+  // Auto-slide effect for hero carousel (3 seconds interval)
+  useEffect(() => {
+    if (heroProducts.length > 0) {
+      const interval = setInterval(() => {
+        setCurrentSlide((prev) => (prev + 1) % heroProducts.length);
+      }, 3000); // 3 seconds
+
+      return () => clearInterval(interval);
+    }
+  }, [heroProducts.length]);
 
   // Get theme configuration
   const t = themeConfig[theme];
@@ -148,9 +167,10 @@ export default function HomePage() {
     router.push(`/category/${categoryId}`);
   };
 
-  const handleRetry = () => {
-    refreshCategories();
+  const handleHeroProductClick = (productId: string) => {
+    router.push(`/product/${productId}`);
   };
+
   const handleSortChange = (value: string) => {
     setSortBy(value);
     // You can implement sorting here
@@ -276,46 +296,96 @@ export default function HomePage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12">
           {/* Main Hero Slide */}
           <div className="lg:col-span-2 relative rounded-3xl overflow-hidden h-96">
-            <div
-              className={`absolute inset-0 bg-gradient-to-r ${heroSlides[currentSlide].bg} p-12 flex items-center justify-between`}
-            >
-              <div className="text-white max-w-md">
-                <h2 className="text-5xl font-bold mb-4">
-                  {heroSlides[currentSlide].title}
-                </h2>
-                <p className="text-3xl font-semibold mb-2">
-                  {heroSlides[currentSlide].subtitle}
-                </p>
-                <p className="text-lg mb-6 whitespace-pre-line opacity-90">
-                  {heroSlides[currentSlide].description}
-                </p>
-                <button className="bg-white text-gray-900 px-8 py-3 rounded-full font-semibold hover:bg-gray-100 transition-colors shadow-lg">
-                  Shop Now
-                </button>
-                <p className="text-sm mt-4 opacity-70">*Incl. All Offers</p>
+            {heroLoading ? (
+              <div className="absolute inset-0 bg-gradient-to-r from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-800 flex items-center justify-center">
+                <Loader2 className="h-12 w-12 animate-spin text-white" />
               </div>
-              <div className="text-9xl hidden md:block">
-                {heroSlides[currentSlide].image}
-              </div>
-            </div>
+            ) : heroProducts.length > 0 ? (
+              <>
+                <div
+                  className={`absolute inset-0 bg-gradient-to-r ${currentSlide % 2 === 0
+                    ? "from-indigo-900 via-blue-900 to-purple-900"
+                    : "from-cyan-500 via-blue-500 to-teal-400"
+                    } p-12 flex items-center justify-between cursor-pointer transition-all duration-500`}
+                  onClick={() =>
+                    handleHeroProductClick(heroProducts[currentSlide]._id)
+                  }
+                >
+                  <div className="text-white max-w-md">
+                    <h2 className="text-5xl font-bold mb-4">
+                      {heroProducts[currentSlide].name}
+                    </h2>
+                    <p className="text-3xl font-semibold mb-2">
+                      From ${" "}
+                      {heroProducts[currentSlide].salePrice?.toLocaleString() ||
+                        heroProducts[currentSlide].basePrice?.toLocaleString()}
+                      *
+                    </p>
+                    <p className="text-lg mb-6 whitespace-pre-line opacity-90">
+                      {heroProducts[currentSlide].offers.discountPercentage}%
+                      OFF
+                      {"\n"}
+                      Limited Time Offer - Save Big!
+                    </p>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleHeroProductClick(heroProducts[currentSlide]._id);
+                      }}
+                      className="bg-white text-gray-900 px-8 py-3 rounded-full font-semibold hover:bg-gray-100 transition-colors shadow-lg"
+                    >
+                      Shop Now
+                    </button>
+                    <p className="text-sm mt-4 opacity-70">*Incl. All Offers</p>
+                  </div>
+                  <div className="hidden md:block relative w-64 h-64">
+                    {heroProducts[currentSlide].images[0] ? (
+                      <img
+                        src={heroProducts[currentSlide].images[0]}
+                        alt={heroProducts[currentSlide].name}
+                        className="w-full h-full object-contain drop-shadow-2xl"
+                      />
+                    ) : (
+                      <div className="text-9xl">🎁</div>
+                    )}
+                  </div>
+                </div>
 
-            {/* Carousel Navigation Dots */}
-            <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
-              {heroSlides.map((_, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => setCurrentSlide(idx)}
-                  className={`h-2 rounded-full transition-all ${idx === currentSlide ? "w-8 bg-white" : "w-2 bg-white/50"
-                    }`}
-                  aria-label={`Go to slide ${idx + 1}`}
-                />
-              ))}
-            </div>
+                {/* Carousel Navigation Dots */}
+                <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
+                  {heroProducts.map((_, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => setCurrentSlide(idx)}
+                      className={`h-2 rounded-full transition-all ${idx === currentSlide ? "w-8 bg-white" : "w-2 bg-white/50"
+                        }`}
+                      aria-label={`Go to slide ${idx + 1}`}
+                    />
+                  ))}
+                </div>
+              </>
+            ) : (
+              // Fallback to static slide if no hero products
+              <div className="absolute inset-0 bg-gradient-to-r from-indigo-900 via-blue-900 to-purple-900 p-12 flex items-center justify-between">
+                <div className="text-white max-w-md">
+                  <h2 className="text-5xl font-bold mb-4">
+                    Amazing Deals Coming Soon!
+                  </h2>
+                  <p className="text-3xl font-semibold mb-2">
+                    Stay Tuned for Big Discounts
+                  </p>
+                  <p className="text-lg mb-6 whitespace-pre-line opacity-90">
+                    Check back soon for exclusive offers
+                  </p>
+                </div>
+                <div className="text-9xl hidden md:block">🎁</div>
+              </div>
+            )}
           </div>
 
           {/* Side Promotional Banner */}
           <div className="rounded-3xl overflow-hidden h-96 bg-gradient-to-br from-cyan-500 via-blue-500 to-teal-400 p-8 flex flex-col items-center justify-center text-white text-center relative shadow-xl">
-            <div className="text-9xl mb-4">👟</div>
+            <div className="text-9xl mb-4">🎁</div>
             <h3 className="text-6xl font-bold mb-2">SALE</h3>
             <p className="text-xl mb-2">UP TO</p>
             <p className="text-7xl font-bold mb-4">50%</p>
