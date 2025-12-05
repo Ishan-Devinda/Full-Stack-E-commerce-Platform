@@ -4,6 +4,7 @@ import { ConfigProvider } from "antd";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { SettingsProvider } from "@/contexts/settingsContext";
+import { SearchProvider } from "@/contexts/SearchContext";
 import GlobalBackground from "@/contexts/BackgroundGradient";
 import "./globals.css";
 import Navbar from "@/components/layout/Navbar";
@@ -29,23 +30,25 @@ export default function RootLayout({
       >
         <ThemeProvider>
           <SettingsProvider>
-            <ConfigProvider
-              theme={{
-                token: {
-                  colorPrimary: "#f43f5e",
-                  borderRadius: 8,
-                },
-              }}
-            >
-              <AuthProvider>
-                <Navbar />
-                {/* 🌈 Background shown below everything */}
-                <GlobalBackground />
+            <SearchProvider>
+              <ConfigProvider
+                theme={{
+                  token: {
+                    colorPrimary: "#f43f5e",
+                    borderRadius: 8,
+                  },
+                }}
+              >
+                <AuthProvider>
+                  <Navbar />
+                  {/* 🌈 Background shown below everything */}
+                  <GlobalBackground />
 
-                {/* All your page content */}
-                {children}
-              </AuthProvider>
-            </ConfigProvider>
+                  {/* All your page content */}
+                  {children}
+                </AuthProvider>
+              </ConfigProvider>
+            </SearchProvider>
           </SettingsProvider>
         </ThemeProvider>
       </body>

@@ -105,6 +105,23 @@ interface ProductData {
     slug: string;
     keywords: string[];
   };
+  reviews?: Review[];
+}
+
+interface Review {
+  _id: string;
+  user: {
+    _id: string;
+    email: string;
+    username?: string;
+  };
+  rating: number;
+  comment: string;
+  images?: string[];
+  verifiedPurchase: boolean;
+  helpful: number;
+  createdAt: string;
+  updatedAt: string;
 }
 
 const ProductDetailPage: React.FC = () => {
@@ -656,9 +673,72 @@ const ProductDetailPage: React.FC = () => {
                     </div>
 
                     {/* Reviews List */}
-                    <div className={`text-center py-8 ${t.textSecondary}`}>
-                      <p>No reviews yet. Be the first to review this product!</p>
-                    </div>
+                    {product.reviews && product.reviews.length > 0 ? (
+                      <div className="space-y-6">
+                        {product.reviews.map((review) => (
+                          <div
+                            key={review._id}
+                            className={`rounded-lg ${t.card} p-6 border ${t.border}`}
+                          >
+                            <div className="flex items-start justify-between mb-4">
+                              <div className="flex items-center gap-3">
+                                <Avatar size={48} className="bg-blue-500">
+                                  {review.user.email[0].toUpperCase()}
+                                </Avatar>
+                                <div>
+                                  <div className={`font-semibold ${t.text}`}>
+                                    {review.user.username || review.user.email.split('@')[0]}
+                                  </div>
+                                  <div className={`text-sm ${t.textSecondary}`}>
+                                    {review.user.email}
+                                  </div>
+                                  <div className={`text-xs ${t.textSecondary} mt-1`}>
+                                    {new Date(review.createdAt).toLocaleDateString('en-US', {
+                                      year: 'numeric',
+                                      month: 'long',
+                                      day: 'numeric'
+                                    })}
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="text-right">
+                                <Rate disabled value={review.rating} className="text-sm" />
+                                {review.verifiedPurchase && (
+                                  <Tag color="green" className="mt-2">
+                                    Verified Purchase
+                                  </Tag>
+                                )}
+                              </div>
+                            </div>
+
+                            {review.comment && (
+                              <p className={`${t.text} leading-relaxed`}>
+                                {review.comment}
+                              </p>
+                            )}
+
+                            {review.images && review.images.length > 0 && (
+                              <div className="flex gap-2 mt-4">
+                                {review.images.map((img, idx) => (
+                                  <div key={idx} className="relative w-20 h-20 rounded overflow-hidden">
+                                    <Image
+                                      src={img}
+                                      alt={`Review image ${idx + 1}`}
+                                      fill
+                                      className="object-cover"
+                                    />
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className={`text-center py-8 ${t.textSecondary}`}>
+                        <p>No reviews yet. Be the first to review this product!</p>
+                      </div>
+                    )}
                   </div>
                 ),
               },

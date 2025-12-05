@@ -3,6 +3,9 @@
 import React, { useState } from "react";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useSettings, AVAILABLE_CURRENCIES } from "@/contexts/settingsContext";
+import { useAuth } from "@/hooks/useAuth";
+import { useSearch } from "@/contexts/SearchContext";
+import { useRouter, usePathname } from "next/navigation";
 import {
   ShoppingCart,
   User,
@@ -11,6 +14,8 @@ import {
   Moon,
   MapPin,
   ChevronDown,
+  LogOut,
+  UserCircle,
 } from "lucide-react";
 import { themeConfig } from "@/lib/theme";
 import Link from "next/link";
@@ -19,23 +24,25 @@ export default function Navbar() {
   const { theme, toggleTheme } = useTheme();
   const { language, currency, country, setLanguage, setCurrency, setCountry } =
     useSettings();
+  const { user } = useAuth();
+  const { searchQuery, searchInput, setSearchInput, triggerSearch } = useSearch();
+  const router = useRouter();
+  const pathname = usePathname();
   const [showThemeMenu, setShowThemeMenu] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
   const t = themeConfig[theme];
 
-  const searchSuggestions = [
-    "iPhone 16 Pro Max",
-    "Nike Sneakers",
-    "Luxury Bags",
-    "Home Decor",
-    "Smart Watch",
-  ];
+  // Check if we're on the main page or search page
+  const isMainPage = pathname === "/";
+  const isSearchPage = pathname === "/search";
+  const isSearchEnabled = isMainPage || isSearchPage;
 
-  const filteredSuggestions = searchQuery
-    ? searchSuggestions.filter((s) =>
-      s.toLowerCase().includes(searchQuery.toLowerCase())
-    )
-    : [];
+  const handleSearch = () => {
+    if (searchInput.trim()) {
+      // Navigate to search page with query
+      router.push(`/search?q=${encodeURIComponent(searchInput)}`);
+    }
+  };
 
   return (
     <nav
@@ -53,38 +60,40 @@ export default function Navbar() {
             </div>
           </Link>
 
-          {/* Search Bar */}
+          {/* Search Bar - Works on main page and search page */}
           <div className="flex-1 max-w-2xl mx-8 relative">
-            <div className="relative">
-              <Search
-                className={`absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 ${t.textSecondary}`}
-              />
+            <div className="relative flex items-center">
               <input
                 type="text"
-                placeholder="Search for products..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className={`w-full pl-10 pr-4 py-2 rounded-lg ${t.input} border ${t.border} focus:outline-none focus:ring-2 focus:ring-pink-500 transition-all`}
+                placeholder={isSearchEnabled ? "Search for products..." : "Search (available on home page)"}
+                value={searchInput}
+                onChange={(e) => {
+                  if (isSearchEnabled) {
+                    setSearchInput(e.target.value);
+                  }
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && searchInput.trim()) {
+                    handleSearch();
+                  }
+                }}
+                disabled={!isSearchEnabled}
+                className={`w-full pl-10 pr-12 py-2 rounded-lg ${t.input} border ${t.border} focus:outline-none focus:ring-2 focus:ring-pink-500 transition-all ${!isSearchEnabled ? "opacity-50 cursor-not-allowed" : ""
+                  }`}
               />
+              <Search
+                className={`absolute left-3 h-5 w-5 ${t.textSecondary}`}
+              />
+              {isSearchEnabled && (
+                <button
+                  onClick={handleSearch}
+                  className="absolute right-2 p-1.5 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                  disabled={!searchInput.trim()}
+                >
+                  <Search className={`h-5 w-5 ${searchInput.trim() ? 'text-blue-500' : t.textSecondary}`} />
+                </button>
+              )}
             </div>
-
-            {/* Search Suggestions Dropdown */}
-            {filteredSuggestions.length > 0 && searchQuery && (
-              <div
-                className={`absolute top-full left-0 right-0 mt-2 ${t.card} ${t.shadow} rounded-lg overflow-hidden z-50 border ${t.border}`}
-              >
-                {filteredSuggestions.map((suggestion, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => setSearchQuery(suggestion)}
-                    className={`w-full text-left px-4 py-3 ${t.hover} ${t.text} transition-colors`}
-                  >
-                    <Search className="inline h-4 w-4 mr-2 opacity-50" />
-                    {suggestion}
-                  </button>
-                ))}
-              </div>
-            )}
           </div>
 
           {/* Right Side Icons */}
@@ -102,11 +111,8 @@ export default function Navbar() {
               </div>
             </button>
 
-            {/* Country/Currency Display */}
-
             {/* Cart */}
             <Link href={"/Cart"}>
-              {" "}
               <button
                 className={`relative ${t.hover} p-2 rounded-lg transition-colors`}
               >
@@ -170,12 +176,9 @@ export default function Navbar() {
                         />
                       </div>
                     </button>
-
-                    {/* Currency Selector */}
                   </div>
                 </>
               )}
-              11
             </div>
 
             <select
@@ -190,15 +193,73 @@ export default function Navbar() {
               ))}
             </select>
 
-            {/* Sign In Button */}
-            <Link href={"/auth/login"}>
-              <button
-                className={`flex items-center space-x-2 ${t.hover} px-4 py-2 rounded-lg transition-colors`}
-              >
-                <User className="h-5 w-5" />
-                <span className="font-semibold hidden lg:inline">Sign In</span>
-              </button>
-            </Link>
+            {/* User Profile / Sign In */}
+            {user ? (
+              <div className="relative">
+                <button
+                  onClick={() => setShowProfileMenu(!showProfileMenu)}
+                  className={`flex items-center space-x-2 ${t.hover} px-4 py-2 rounded-lg transition-colors`}
+                >
+                  <User className="h-5 w-5" />
+                  <span className="font-semibold hidden lg:inline">
+                    {user.username || "Account"}
+                  </span>
+                  <ChevronDown className="h-4 w-4" />
+                </button>
+
+                {showProfileMenu && (
+                  <>
+                    {/* Backdrop to close menu */}
+                    <div
+                      className="fixed inset-0 z-40"
+                      onClick={() => setShowProfileMenu(false)}
+                    />
+
+                    {/* Dropdown Menu */}
+                    <div
+                      className={`absolute right-0 mt-2 w-56 ${t.card} ${t.shadow} rounded-lg p-2 space-y-1 z-50 border ${t.border}`}
+                    >
+                      {/* Profile Link */}
+                      <Link href="/profile">
+                        <button
+                          onClick={() => setShowProfileMenu(false)}
+                          className={`w-full flex items-center space-x-3 px-4 py-3 ${t.hover} rounded-lg transition-colors`}
+                        >
+                          <UserCircle className="h-5 w-5" />
+                          <span className="font-medium">My Profile</span>
+                        </button>
+                      </Link>
+
+                      {/* Divider */}
+                      <div className={`border-t ${t.border} my-1`} />
+
+                      {/* Logout */}
+                      <button
+                        onClick={() => {
+                          localStorage.removeItem("token");
+                          setShowProfileMenu(false);
+                          router.push("/");
+                          window.location.reload();
+                        }}
+                        className={`w-full flex items-center space-x-3 px-4 py-3 ${t.hover} rounded-lg transition-colors text-red-500`}
+                      >
+                        <LogOut className="h-5 w-5" />
+                        <span className="font-medium">Logout</span>
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
+            ) : (
+              <Link href={"/auth/login"}>
+                <button
+                  className={`flex items-center space-x-2 ${t.hover} px-4 py-2 rounded-lg transition-colors`}
+                >
+                  <User className="h-5 w-5" />
+                  <span className="font-semibold hidden lg:inline">Sign In</span>
+                </button>
+              </Link>
+            )}
           </div>
         </div>
       </div>

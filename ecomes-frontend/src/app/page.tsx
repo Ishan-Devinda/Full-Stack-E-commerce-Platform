@@ -4,6 +4,7 @@
 import React, { useState, useEffect } from "react";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useSettings } from "@/contexts/settingsContext";
+import { useSearch } from "@/contexts/SearchContext";
 import { useCategories } from "@/hooks/useCategories";
 import { useCategoryUtils } from "@/hooks/useCategoryUtils";
 import { useProducts } from "@/hooks/useProducts";
@@ -119,7 +120,6 @@ export default function HomePage() {
   // Local state
   const [showThemeMenu, setShowThemeMenu] = useState(false);
   const [showCategoryMenu, setShowCategoryMenu] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
   const [currentSlide, setCurrentSlide] = useState(0);
   const [sortBy, setSortBy] = useState("createdAt");
 
@@ -136,13 +136,6 @@ export default function HomePage() {
 
   // Get theme configuration
   const t = themeConfig[theme];
-
-  // Filter search suggestions
-  const filteredSuggestions = searchQuery
-    ? searchSuggestions.filter((s) =>
-      s.toLowerCase().includes(searchQuery.toLowerCase())
-    )
-    : [];
 
   const router = useRouter();
   const popularCategories = categories.map((category) => ({
