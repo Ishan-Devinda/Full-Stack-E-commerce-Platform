@@ -55,8 +55,8 @@ export default function SearchPage() {
     };
 
     return (
-        <div className={`min-h-screen ${t.bg} py-8`}>
-            <div className="max-w-7xl mx-auto px-4">
+        <div className="min-h-screen py-8 relative">
+            <div className="max-w-7xl mx-auto px-4 relative z-10">
                 {/* Header */}
                 <div className="mb-6">
                     <h1 className={`text-3xl font-bold ${t.text}`}>

@@ -32,8 +32,8 @@ const ProfileLayout: React.FC<ProfileLayoutProps> = ({ children }) => {
     };
 
     return (
-        <div className={`min-h-screen ${t.bg} ${t.text} py-8`}>
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="min-h-screen relative py-8">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
                 <h1 className="text-3xl font-bold mb-8">My Account</h1>
 
                 <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
@@ -50,8 +50,8 @@ const ProfileLayout: React.FC<ProfileLayoutProps> = ({ children }) => {
                                             key={item.path}
                                             onClick={() => router.push(item.path)}
                                             className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${isActive
-                                                    ? "bg-blue-500 text-white"
-                                                    : `${t.hover} ${t.text}`
+                                                ? "bg-blue-500 text-white"
+                                                : `${t.hover} ${t.text}`
                                                 }`}
                                         >
                                             <Icon className="h-5 w-5" />

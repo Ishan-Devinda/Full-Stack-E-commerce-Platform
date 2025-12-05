@@ -68,8 +68,8 @@ export default function SubCategoryPage({
   const FilterSidebar = ({ isMobile = false }: { isMobile?: boolean }) => (
     <div
       className={`${isMobile
-          ? "fixed inset-0 z-50 bg-white overflow-y-auto"
-          : "sticky top-4"
+        ? "fixed inset-0 z-50 bg-white overflow-y-auto"
+        : "sticky top-4"
         } bg-white rounded-2xl p-6 shadow-sm border border-gray-200`}
     >
       {/* Mobile Header */}
@@ -184,7 +184,7 @@ export default function SubCategoryPage({
   // MAIN RENDER
   // ============================
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen relative">
       {/* Breadcrumb */}
       <div className="bg-white border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">

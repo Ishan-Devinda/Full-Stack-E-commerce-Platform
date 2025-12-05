@@ -186,7 +186,7 @@ const ProductDetailPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className={`min-h-screen flex items-center justify-center ${t.bg}`}>
+      <div className="min-h-screen flex items-center justify-center relative">
         <div className="text-center">
           <Spin indicator={<LoadingOutlined style={{ fontSize: 48 }} spin />} />
           <p className={`mt-4 ${t.text}`}>Loading product details...</p>
@@ -197,7 +197,7 @@ const ProductDetailPage: React.FC = () => {
 
   if (error || !product) {
     return (
-      <div className={`min-h-screen flex items-center justify-center ${t.bg}`}>
+      <div className="min-h-screen flex items-center justify-center relative">
         <div className="text-center">
           <p className="text-red-500 mb-4">
             {error || "Product not found"}

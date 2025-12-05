@@ -169,7 +169,7 @@ export default function CategoryPage({
   // Loading state for category
   if (categoryLoading) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen relative">
         <div className="bg-white border-b">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
             <Skeleton.Button active size="small" style={{ width: 200 }} />
@@ -190,7 +190,7 @@ export default function CategoryPage({
   // Error state for category
   if (categoryError) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center relative">
         <div className="text-center">
           <div className="text-6xl mb-4">❌</div>
           <h1 className="text-2xl font-bold mb-4 text-gray-900">
@@ -220,7 +220,7 @@ export default function CategoryPage({
   // Category not found
   if (!category) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center relative">
         <div className="text-center">
           <div className="text-6xl mb-4">🔍</div>
           <h1 className="text-4xl font-bold mb-4 text-gray-900">
@@ -245,7 +245,7 @@ export default function CategoryPage({
   const categoryColor = getCategoryColor(category._id);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen relative">
       {/* Breadcrumb Navigation */}
       <div className="bg-white border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
