@@ -17,9 +17,11 @@ import {
 import { cartWishlistAPI } from "@/services/cartWishlistService";
 import type { CartItem, WishlistItem } from "@/services/cartWishlistService";
 import { paymentService } from "@/services/paymentService";
+import { useSettings } from "@/contexts/settingsContext";
 
 const EcommerceSystem = () => {
   const router = useRouter();
+  const { formatPrice } = useSettings();
   const [currentPage, setCurrentPage] = useState("cart");
 
   // State
@@ -556,10 +558,10 @@ const EcommerceSystem = () => {
                       </div>
                       <div className="text-right">
                         <p className="font-bold text-gray-800">
-                          ${getItemTotal(item).toFixed(2)}
+                          {formatPrice(getItemTotal(item))}
                         </p>
                         <p className="text-sm text-gray-600">
-                          ${getItemPrice(item).toFixed(2)} each
+                          {formatPrice(getItemPrice(item))} each
                         </p>
                       </div>
                     </div>
@@ -571,21 +573,21 @@ const EcommerceSystem = () => {
               <div className="border-t border-gray-200 pt-4 space-y-3">
                 <div className="flex justify-between text-gray-600">
                   <span>Subtotal</span>
-                  <span>${subtotal.toFixed(2)}</span>
+                  <span>{formatPrice(subtotal)}</span>
                 </div>
                 <div className="flex justify-between text-gray-600">
                   <span>Tax (10%)</span>
-                  <span>${tax.toFixed(2)}</span>
+                  <span>{formatPrice(tax)}</span>
                 </div>
                 <div className="flex justify-between text-gray-600">
                   <span>Shipping</span>
                   <span>
-                    {shipping === 0 ? "FREE" : `$${shipping.toFixed(2)}`}
+                    {shipping === 0 ? "FREE" : formatPrice(shipping)}
                   </span>
                 </div>
                 <div className="flex justify-between text-xl font-bold text-gray-800 pt-3 border-t border-gray-200">
                   <span>Total</span>
-                  <span>${total.toFixed(2)}</span>
+                  <span>{formatPrice(total)}</span>
                 </div>
               </div>
 
@@ -694,7 +696,7 @@ const EcommerceSystem = () => {
                       </td>
                       <td className="px-6 py-4">
                         <span className="font-semibold text-gray-800">
-                          ${getItemPrice(item).toFixed(2)}
+                          {formatPrice(getItemPrice(item))}
                         </span>
                       </td>
                       <td className="px-6 py-4">
@@ -720,7 +722,7 @@ const EcommerceSystem = () => {
                       </td>
                       <td className="px-6 py-4">
                         <span className="font-bold text-gray-800">
-                          ${getItemTotal(item).toFixed(2)}
+                          {formatPrice(getItemTotal(item))}
                         </span>
                       </td>
                       <td className="px-6 py-4">
@@ -775,22 +777,22 @@ const EcommerceSystem = () => {
               <div className="space-y-3">
                 <div className="flex justify-between text-gray-600">
                   <span>Subtotal</span>
-                  <span className="font-semibold">${subtotal.toFixed(2)}</span>
+                  <span className="font-semibold">{formatPrice(subtotal)}</span>
                 </div>
                 <div className="flex justify-between text-gray-600">
                   <span>Tax </span>
-                  <span className="font-semibold">${tax.toFixed(2)}</span>
+                  <span className="font-semibold">{formatPrice(tax)}</span>
                 </div>
                 <div className="flex justify-between text-gray-600">
                   <span>Shipping</span>
                   <span className="font-semibold">
-                    {shipping === 0 ? "FREE" : `$${shipping.toFixed(2)}`}
+                    {shipping === 0 ? "FREE" : formatPrice(shipping)}
                   </span>
                 </div>
                 <div className="border-t border-gray-200 pt-3">
                   <div className="flex justify-between text-xl font-bold text-gray-800">
                     <span>Total</span>
-                    <span>${total.toFixed(2)}</span>
+                    <span>{formatPrice(total)}</span>
                   </div>
                 </div>
               </div>
@@ -880,7 +882,7 @@ const EcommerceSystem = () => {
                     </td>
                     <td className="px-6 py-4">
                       <span className="font-semibold text-gray-800">
-                        ${getWishlistItemPrice(item).toFixed(2)}
+                        {formatPrice(getWishlistItemPrice(item))}
                       </span>
                     </td>
                     <td className="px-6 py-4">
