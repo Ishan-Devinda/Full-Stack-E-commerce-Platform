@@ -14,6 +14,7 @@ const paymentRoutes = require("./routes/paymentRoutes");
 const adminAuthRoutes = require("./routes/adminAuth");
 const productRoutes = require("./routes/productRoutes");
 const userRoutes = require("./routes/userRoutes");
+const imageSearchRoutes = require("./routes/imageSearchRoutes");
 
 const app = express();
 
@@ -46,6 +47,7 @@ app.use("/api/payments", paymentRoutes);
 app.use("/admin/auth", adminAuthRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/user", userRoutes);
+app.use("/api/image-search", imageSearchRoutes);
 
 // Health check
 app.get("/health", (req, res) => {
@@ -106,8 +108,7 @@ const startServer = async () => {
     console.log(`🚀 Server running on port ${PORT}`);
     console.log(`🌍 Environment: ${process.env.NODE_ENV}`);
     console.log(
-      `📊 MongoDB: ${
-        mongoose.connection.readyState === 1 ? "Connected" : "Disconnected"
+      `📊 MongoDB: ${mongoose.connection.readyState === 1 ? "Connected" : "Disconnected"
       }`
     );
   });

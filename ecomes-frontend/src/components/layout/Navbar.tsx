@@ -18,9 +18,11 @@ import {
   UserCircle,
   Menu,
   X,
+  Camera,
 } from "lucide-react";
 import { themeConfig } from "@/lib/theme";
 import Link from "next/link";
+import ImageSearchModal from "@/components/ImageSearchModal";
 
 export default function Navbar() {
   const { theme, toggleTheme } = useTheme();
@@ -33,6 +35,7 @@ export default function Navbar() {
   const [showThemeMenu, setShowThemeMenu] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
+  const [showImageSearch, setShowImageSearch] = useState(false);
   const t = themeConfig[theme];
 
   // Check if we're on the main page or search page
@@ -86,13 +89,24 @@ export default function Navbar() {
               />
               <Search className={`absolute left-3 h-5 w-5 ${t.textSecondary}`} />
               {isSearchEnabled && (
-                <button
-                  onClick={handleSearch}
-                  className="absolute right-2 p-1.5 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
-                  disabled={!searchInput.trim()}
-                >
-                  <Search className={`h-5 w-5 ${searchInput.trim() ? "text-blue-500" : t.textSecondary}`} />
-                </button>
+                <>
+                  {/* Camera Button for Image Search */}
+                  <button
+                    onClick={() => setShowImageSearch(true)}
+                    className="absolute right-12 p-1.5 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                    title="Search by image"
+                  >
+                    <Camera className="h-5 w-5 text-blue-500" />
+                  </button>
+                  {/* Text Search Button */}
+                  <button
+                    onClick={handleSearch}
+                    className="absolute right-2 p-1.5 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                    disabled={!searchInput.trim()}
+                  >
+                    <Search className={`h-5 w-5 ${searchInput.trim() ? "text-blue-500" : t.textSecondary}`} />
+                  </button>
+                </>
               )}
             </div>
           </div>
@@ -311,6 +325,9 @@ export default function Navbar() {
           </div>
         )}
       </div>
+
+      {/* Image Search Modal */}
+      <ImageSearchModal isOpen={showImageSearch} onClose={() => setShowImageSearch(false)} />
     </nav>
   );
 }
