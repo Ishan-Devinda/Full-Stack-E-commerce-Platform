@@ -1,35 +1,109 @@
 "use client";
 
-import React, { useState, useCallback } from "react";
-import { Upload, X, Camera, Loader2, Image as ImageIcon } from "lucide-react";
+import React, { useState, useCallback, useRef, useEffect } from "react";
+import { X, Camera, Loader2, Image as ImageIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useTheme } from "@/contexts/ThemeContext";
 import { themeConfig } from "@/lib/theme";
+import * as tf from '@tensorflow/tfjs';
+import * as mobilenet from '@tensorflow-models/mobilenet';
 
 interface ImageSearchModalProps {
     isOpen: boolean;
     onClose: () => void;
 }
 
+// Category mapping to convert specific items to broader categories
+const CATEGORY_MAPPING: { [key: string]: string[] } = {
+    // Footwear
+    'shoe': ['shoes', 'footwear'],
+    'sneaker': ['shoes', 'footwear', 'sneakers'],
+    'boot': ['shoes', 'footwear', 'boots'],
+    'sandal': ['shoes', 'footwear', 'sandals'],
+    'slipper': ['shoes', 'footwear', 'slippers'],
+
+    // Watches & Accessories
+    'watch': ['watch', 'watches', 'timepiece'],
+    'wristwatch': ['watch', 'watches'],
+    'clock': ['watch', 'watches', 'clock'],
+
+    // Electronics
+    'laptop': ['laptop', 'computer', 'electronics'],
+    'notebook': ['laptop', 'computer', 'electronics'],
+    'computer': ['computer', 'electronics', 'laptop'],
+    'phone': ['phone', 'mobile', 'smartphone', 'electronics'],
+    'tablet': ['tablet', 'electronics'],
+    'monitor': ['monitor', 'display', 'electronics'],
+    'keyboard': ['keyboard', 'computer', 'electronics'],
+    'mouse': ['mouse', 'computer', 'electronics'],
+
+    // Clothing
+    'shirt': ['shirt', 'clothing', 'apparel'],
+    'tshirt': ['tshirt', 't-shirt', 'clothing', 'apparel'],
+    'dress': ['dress', 'clothing', 'apparel'],
+    'jean': ['jeans', 'pants', 'clothing', 'apparel'],
+    'jacket': ['jacket', 'clothing', 'apparel', 'outerwear'],
+    'coat': ['coat', 'clothing', 'apparel', 'outerwear'],
+    'sweater': ['sweater', 'clothing', 'apparel'],
+
+    // Bags
+    'bag': ['bag', 'bags'],
+    'backpack': ['backpack', 'bag', 'bags'],
+    'handbag': ['handbag', 'bag', 'bags'],
+    'purse': ['purse', 'bag', 'bags'],
+
+    // Furniture
+    'chair': ['chair', 'furniture'],
+    'table': ['table', 'furniture'],
+    'desk': ['desk', 'furniture', 'table'],
+    'sofa': ['sofa', 'furniture', 'couch'],
+    'bed': ['bed', 'furniture'],
+
+    // Sports & Fitness
+    'ball': ['ball', 'sports'],
+    'racket': ['racket', 'sports'],
+    'dumbbell': ['dumbbell', 'fitness', 'sports'],
+
+    // Kitchen
+    'bottle': ['bottle', 'drinkware'],
+    'cup': ['cup', 'mug', 'drinkware'],
+    'mug': ['mug', 'cup', 'drinkware'],
+    'plate': ['plate', 'dinnerware'],
+};
+
 export default function ImageSearchModal({ isOpen, onClose }: ImageSearchModalProps) {
     const [selectedImage, setSelectedImage] = useState<File | null>(null);
     const [preview, setPreview] = useState<string>("");
     const [loading, setLoading] = useState(false);
+    const [loadingModel, setLoadingModel] = useState(false);
     const [error, setError] = useState<string>("");
     const router = useRouter();
     const { theme } = useTheme();
     const t = themeConfig[theme];
+    const imageRef = useRef<HTMLImageElement>(null);
+    const modelRef = useRef<mobilenet.MobileNet | null>(null);
+
+    // Initialize TensorFlow.js backend
+    useEffect(() => {
+        const initTensorFlow = async () => {
+            try {
+                await tf.ready();
+                console.log('✅ TensorFlow.js backend ready:', tf.getBackend());
+            } catch (err) {
+                console.error('❌ Failed to initialize TensorFlow.js:', err);
+            }
+        };
+        initTensorFlow();
+    }, []);
 
     const handleImageSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
-            // Validate file size (5MB max)
             if (file.size > 5 * 1024 * 1024) {
                 setError("Image size must be less than 5MB");
                 return;
             }
 
-            // Validate file type
             if (!file.type.startsWith("image/")) {
                 setError("Please select a valid image file");
                 return;
@@ -59,39 +133,77 @@ export default function ImageSearchModal({ isOpen, onClose }: ImageSearchModalPr
         e.preventDefault();
     }, []);
 
+    // Extract broader category keywords from AI predictions
+    const extractCategoryKeywords = (predictions: any[]): string[] => {
+        const allKeywords = new Set<string>();
+
+        predictions.forEach((p) => {
+            // Get the first word from className (most important)
+            const firstWord = p.className
+                .toLowerCase()
+                .split(',')[0] // Take only first part before comma
+                .split(' ')[0] // Take only first word
+                .replace(/_/g, ' ')
+                .trim();
+
+            // Add the original keyword
+            allKeywords.add(firstWord);
+
+            // Check if we have a category mapping
+            Object.keys(CATEGORY_MAPPING).forEach((key) => {
+                if (firstWord.includes(key) || key.includes(firstWord)) {
+                    // Add all mapped categories
+                    CATEGORY_MAPPING[key].forEach((cat) => allKeywords.add(cat));
+                }
+            });
+        });
+
+        return Array.from(allKeywords).slice(0, 8); // Return top 8 keywords
+    };
+
     const handleSearch = async () => {
-        if (!selectedImage) return;
+        if (!selectedImage || !imageRef.current) return;
 
         setLoading(true);
         setError("");
 
-        const formData = new FormData();
-        formData.append("image", selectedImage);
-
         try {
-            const response = await fetch("http://localhost:5000/api/image-search/search-by-image", {
-                method: "POST",
-                body: formData,
-            });
+            await tf.ready();
 
-            const data = await response.json();
+            if (!modelRef.current) {
+                setLoadingModel(true);
+                console.log('🤖 Loading TensorFlow.js MobileNet model...');
+                modelRef.current = await mobilenet.load();
+                setLoadingModel(false);
+                console.log('✅ Model loaded successfully');
+            }
 
-            if (data.success && data.keywords && data.keywords.length > 0) {
-                // Navigate to search page with keywords
-                const searchQuery = data.keywords.join(" ");
+            console.log('🔍 Classifying image...');
+            const predictions = await modelRef.current.classify(imageRef.current);
+            console.log('🎯 Raw predictions:', predictions);
+
+            // Extract broader category keywords
+            const keywords = extractCategoryKeywords(
+                predictions.filter((p) => p.probability > 0.05)
+            );
+
+            console.log('✅ Extracted category keywords:', keywords);
+
+            if (keywords.length > 0) {
+                const searchQuery = keywords.join(" ");
                 router.push(`/search?q=${encodeURIComponent(searchQuery)}&imageSearch=true`);
                 onClose();
-                // Clean up
                 setSelectedImage(null);
                 setPreview("");
             } else {
-                setError(data.message || "Could not identify product in image. Try a clearer image.");
+                setError("Could not identify product in image. Try a clearer image.");
             }
         } catch (err) {
-            console.error("Image search failed:", err);
-            setError("Failed to search by image. Please try again.");
+            console.error("❌ Image classification failed:", err);
+            setError("Failed to analyze image. Please try again.");
         } finally {
             setLoading(false);
+            setLoadingModel(false);
         }
     };
 
@@ -111,7 +223,7 @@ export default function ImageSearchModal({ isOpen, onClose }: ImageSearchModalPr
                 <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-2">
                         <Camera className="h-6 w-6 text-blue-500" />
-                        <h2 className={`text-2xl font-bold ${t.text}`}>Search by Image</h2>
+                        <h2 className={`text-2xl font-bold ${t.text}`}>AI Image Search</h2>
                     </div>
                     <button
                         onClick={handleClose}
@@ -119,6 +231,13 @@ export default function ImageSearchModal({ isOpen, onClose }: ImageSearchModalPr
                     >
                         <X className="h-6 w-6" />
                     </button>
+                </div>
+
+                {/* Info Banner */}
+                <div className={`mb-4 p-3 rounded-lg ${t.bgSecondary} border ${t.border}`}>
+                    <p className={`text-xs ${t.textSecondary}`}>
+                        🤖 <strong>Powered by TensorFlow.js</strong> - Searches by category, subcategory & product name!
+                    </p>
                 </div>
 
                 {/* Error Message */}
@@ -155,9 +274,11 @@ export default function ImageSearchModal({ isOpen, onClose }: ImageSearchModalPr
                         {/* Preview */}
                         <div className="relative">
                             <img
+                                ref={imageRef}
                                 src={preview}
                                 alt="Preview"
                                 className={`w-full h-64 object-contain rounded-lg ${t.bgSecondary}`}
+                                crossOrigin="anonymous"
                             />
                             <button
                                 onClick={() => {
@@ -182,10 +303,15 @@ export default function ImageSearchModal({ isOpen, onClose }: ImageSearchModalPr
                         {/* Search Button */}
                         <button
                             onClick={handleSearch}
-                            disabled={loading}
+                            disabled={loading || loadingModel}
                             className="w-full py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl font-semibold hover:from-blue-600 hover:to-blue-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                         >
-                            {loading ? (
+                            {loadingModel ? (
+                                <>
+                                    <Loader2 className="h-5 w-5 animate-spin" />
+                                    Loading AI Model...
+                                </>
+                            ) : loading ? (
                                 <>
                                     <Loader2 className="h-5 w-5 animate-spin" />
                                     Analyzing Image...
@@ -203,7 +329,7 @@ export default function ImageSearchModal({ isOpen, onClose }: ImageSearchModalPr
                 {/* Info */}
                 <div className={`mt-4 p-3 rounded-lg ${t.bgSecondary}`}>
                     <p className={`text-xs ${t.textSecondary}`}>
-                        💡 <strong>Tip:</strong> Use clear images with good lighting for best results
+                        💡 <strong>Tip:</strong> Upload clear product images. AI will search across categories, subcategories & product names!
                     </p>
                 </div>
             </div>
