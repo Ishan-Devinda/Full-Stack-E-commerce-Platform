@@ -12,8 +12,13 @@ import { Pagination, Slider, Rate, Select } from "antd";
 export default function SearchPage() {
     const searchParams = useSearchParams();
     const query = searchParams.get("q") || "";
+    const isVisualSearch = searchParams.get("visualSearch") === "true";
     const { theme } = useTheme();
     const t = themeConfig[theme];
+
+    // Visual search state
+    const [visualSearchResults, setVisualSearchResults] = useState<any[]>([]);
+    const [usingVisualSearch, setUsingVisualSearch] = useState(false);
 
     // Filter states
     const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000]);
@@ -23,6 +28,40 @@ export default function SearchPage() {
     const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
     const [currentPage, setCurrentPage] = useState(1);
     const [showFilters, setShowFilters] = useState(true);
+
+    // Check for visual search results whenever the URL changes
+    useEffect(() => {
+        if (isVisualSearch) {
+            const storedResults = sessionStorage.getItem('visualSearchResults');
+
+            console.log('Visual search results:', storedResults);
+
+            if (storedResults) {
+                try {
+                    const results = JSON.parse(storedResults);
+                    console.log('📊 Loading visual search results:', results.length, 'products');
+                    setVisualSearchResults(results);
+                    setUsingVisualSearch(true);
+                    sessionStorage.removeItem('visualSearchResults');
+                } catch (err) {
+                    console.error('Error parsing visual search results:', err);
+                }
+            }
+        } else if (!isVisualSearch && usingVisualSearch) {
+            // Reset visual search when switching to text search
+            console.log('🔄 Switching from visual search to text search');
+            setUsingVisualSearch(false);
+            setVisualSearchResults([]);
+        }
+    }, [isVisualSearch, searchParams]); // Re-run when URL changes
+
+    // Reset visual search when user performs a new text search
+    useEffect(() => {
+        if (!isVisualSearch && usingVisualSearch) {
+            setUsingVisualSearch(false);
+            setVisualSearchResults([]);
+        }
+    }, [query, isVisualSearch, usingVisualSearch]);
 
     // Fetch products with filters
     const {
@@ -42,9 +81,14 @@ export default function SearchPage() {
         limit: 12,
     });
 
-    const products = Array.isArray(productsData?.products)
-        ? productsData.products
-        : [];
+    // Use visual search results if available, otherwise use API results
+    const products = usingVisualSearch
+        ? visualSearchResults
+        : (Array.isArray(productsData?.products) ? productsData.products : []);
+
+    const totalProducts = usingVisualSearch
+        ? visualSearchResults.length
+        : (pagination?.totalProducts || 0);
 
     const handleClearFilters = () => {
         setPriceRange([0, 1000]);
@@ -60,10 +104,11 @@ export default function SearchPage() {
                 {/* Header */}
                 <div className="mb-6">
                     <h1 className={`text-3xl font-bold ${t.text}`}>
-                        Search Results {query && `for "${query}"`}
+                        {usingVisualSearch ? "🔍 Visual Search Results" : `Search Results ${query && `for "${query}"`}`}
                     </h1>
                     <p className={`${t.textSecondary} mt-2`}>
-                        {loading ? "Searching..." : `${pagination?.totalProducts || 0} products found`}
+                        {loading && !usingVisualSearch ? "Searching..." : `${totalProducts} products found`}
+                        {usingVisualSearch && " (sorted by similarity)"}
                     </p>
                 </div>
 

@@ -15,6 +15,7 @@ const adminAuthRoutes = require("./routes/adminAuth");
 const productRoutes = require("./routes/productRoutes");
 const userRoutes = require("./routes/userRoutes");
 const imageSearchRoutes = require("./routes/imageSearchRoutes");
+const visualSearchRoutes = require("./routes/visualSearchRoutes");
 
 const app = express();
 
@@ -48,6 +49,7 @@ app.use("/admin/auth", adminAuthRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/image-search", imageSearchRoutes);
+app.use("/api/visual-search", visualSearchRoutes);
 
 // Health check
 app.get("/health", (req, res) => {
