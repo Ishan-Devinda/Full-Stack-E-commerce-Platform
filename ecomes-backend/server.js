@@ -16,6 +16,7 @@ const productRoutes = require("./routes/productRoutes");
 const userRoutes = require("./routes/userRoutes");
 const imageSearchRoutes = require("./routes/imageSearchRoutes");
 const visualSearchRoutes = require("./routes/visualSearchRoutes");
+const chatbotRoutes = require("./routes/chatbotRoutes");
 
 const app = express();
 
@@ -50,6 +51,7 @@ app.use("/api/products", productRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/image-search", imageSearchRoutes);
 app.use("/api/visual-search", visualSearchRoutes);
+app.use("/api/chatbot", chatbotRoutes);
 
 // Health check
 app.get("/health", (req, res) => {
@@ -60,7 +62,7 @@ app.get("/health", (req, res) => {
   });
 });
 
-// 404 handler - FIXED: Remove the "*" pattern
+// 404 handler
 app.use((req, res) => {
   res.status(404).json({
     message: `Route ${req.method} ${req.originalUrl} not found`,

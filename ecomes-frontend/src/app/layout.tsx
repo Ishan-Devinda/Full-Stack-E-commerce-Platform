@@ -9,6 +9,8 @@ import GlobalBackground from "@/contexts/BackgroundGradient";
 import "./globals.css";
 import Navbar from "@/components/layout/Navbar";
 
+import ChatbotWidget from "@/components/chatbot/ChatbotWidget";
+
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -41,6 +43,7 @@ export default function RootLayout({
               >
                 <AuthProvider>
                   <Navbar />
+                  <ChatbotWidget />
                   {/* 🌈 Background shown below everything */}
                   <GlobalBackground />
 
