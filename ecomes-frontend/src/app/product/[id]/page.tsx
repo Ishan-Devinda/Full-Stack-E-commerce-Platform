@@ -48,6 +48,14 @@ interface ProductVariant {
   _id?: string;
 }
 
+interface ProductDocument {
+  _id?: string;
+  name: string;
+  type: string;
+  fileUrl: string;
+  fileSize: number;
+}
+
 interface ProductData {
   _id: string;
   name: string;
@@ -69,6 +77,7 @@ interface ProductData {
   variants: ProductVariant[];
   features: string[];
   tags: string[];
+  productDocuments?: ProductDocument[];
   offers: {
     discountPercentage: number;
     isOnSale: boolean;
@@ -596,17 +605,54 @@ const ProductDetailPage: React.FC = () => {
                 children: (
                   <div className="prose max-w-none py-6">
                     <h2 className={`text-2xl font-bold ${t.text}`}>Product Description</h2>
-                    <p className={`mt-4 ${t.text}`}>
-                      {product.description || product.shortDescription}
-                    </p>
-                    <h3 className={`mt-6 text-xl font-semibold ${t.text}`}>
-                      Key Features:
-                    </h3>
-                    <ul className={`mt-3 space-y-2 ${t.text}`}>
-                      {(product.features || []).map((feature, index) => (
-                        <li key={index}>{feature}</li>
-                      ))}
-                    </ul>
+                    <div className={`mt-4 ${t.text}`} dangerouslySetInnerHTML={{ __html: product.description || product.shortDescription }} />
+
+                    {product.features && product.features.length > 0 && (
+                      <>
+                        <h3 className={`mt-6 text-xl font-semibold ${t.text}`}>
+                          Key Features:
+                        </h3>
+                        <ul className={`mt-3 space-y-2 ${t.text}`}>
+                          {product.features.map((feature, index) => (
+                            <li key={index}>{feature}</li>
+                          ))}
+                        </ul>
+                      </>
+                    )}
+
+                    {/* Product Documents */}
+                    {product.productDocuments && product.productDocuments.length > 0 && (
+                      <>
+                        <h3 className={`mt-8 text-xl font-semibold ${t.text}`}>
+                          Product Documents
+                        </h3>
+                        <div className="mt-4 space-y-3">
+                          {product.productDocuments.map((doc, index) => (
+                            <div key={index} className={`flex items-center justify-between p-4 rounded-lg border ${t.border} ${t.card}`}>
+                              <div className="flex items-center gap-3">
+                                <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
+                                  <span className="text-2xl">📄</span>
+                                </div>
+                                <div>
+                                  <div className={`font-semibold ${t.text}`}>{doc.name}</div>
+                                  <div className={`text-sm ${t.textSecondary}`}>
+                                    {doc.type.charAt(0).toUpperCase() + doc.type.slice(1)} • {(doc.fileSize / 1024).toFixed(1)} KB
+                                  </div>
+                                </div>
+                              </div>
+                              <Button
+                                type="primary"
+                                href={doc.fileUrl}
+                                target="_blank"
+                                icon={<span>📥</span>}
+                              >
+                                Download
+                              </Button>
+                            </div>
+                          ))}
+                        </div>
+                      </>
+                    )}
                   </div>
                 ),
               },
@@ -752,46 +798,68 @@ const ProductDetailPage: React.FC = () => {
                         <h2 className={`mb-6 text-2xl font-bold ${t.text}`}>
                           About {product.company.name}
                         </h2>
-                        <div className="space-y-4">
-                          <p className={t.text}>
-                            {product.company.description}
-                          </p>
-                          <div className="flex items-center gap-4">
-                            {product.company.logo && (
+                        <div className="space-y-6">
+                          {product.company.logo && (
+                            <div className="flex justify-center p-6 bg-gray-50 rounded-lg">
                               <Image
                                 src={product.company.logo}
                                 alt={`${product.company.name} logo`}
-                                width={100}
-                                height={60}
+                                width={200}
+                                height={120}
                                 className="object-contain"
                               />
-                            )}
-                            <div className={t.text}>
-                              <p>
-                                <strong>Email:</strong>{" "}
+                            </div>
+                          )}
+
+                          <div className={`${t.text} leading-relaxed`}>
+                            {product.company.description}
+                          </div>
+
+                          <div className={`grid grid-cols-1 md:grid-cols-2 gap-4 p-4 rounded-lg border ${t.border} ${t.card}`}>
+                            <div>
+                              <div className={`text-sm ${t.textSecondary} mb-1`}>Contact Email</div>
+                              <a href={`mailto:${product.company.contactEmail}`} className="text-blue-600 font-medium">
                                 {product.company.contactEmail}
-                              </p>
-                              <p>
-                                <strong>Website:</strong>{" "}
+                              </a>
+                            </div>
+                            {product.company.website && (
+                              <div>
+                                <div className={`text-sm ${t.textSecondary} mb-1`}>Website</div>
                                 <a
                                   href={product.company.website}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="text-blue-600"
+                                  className="text-blue-600 font-medium"
                                 >
                                   {product.company.website}
                                 </a>
-                              </p>
-                            </div>
+                              </div>
+                            )}
                           </div>
+
                           {product.company.aboutPdf && (
-                            <Button
-                              type="primary"
-                              href={product.company.aboutPdf}
-                              target="_blank"
-                            >
-                              Download Company Profile
-                            </Button>
+                            <div className={`p-6 rounded-lg border ${t.border} ${t.card}`}>
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-4">
+                                  <div className="w-16 h-16 bg-blue-100 rounded-lg flex items-center justify-center">
+                                    <span className="text-3xl">📋</span>
+                                  </div>
+                                  <div>
+                                    <div className={`font-semibold text-lg ${t.text}`}>Company Profile</div>
+                                    <div className={`text-sm ${t.textSecondary}`}>Detailed information about {product.company.name}</div>
+                                  </div>
+                                </div>
+                                <Button
+                                  type="primary"
+                                  size="large"
+                                  href={product.company.aboutPdf}
+                                  target="_blank"
+                                  icon={<span className="mr-2">📥</span>}
+                                >
+                                  Download PDF
+                                </Button>
+                              </div>
+                            </div>
                           )}
                         </div>
                       </>

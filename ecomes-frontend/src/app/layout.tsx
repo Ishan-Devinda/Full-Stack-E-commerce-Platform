@@ -1,4 +1,5 @@
-import type { Metadata } from "next";
+"use client";
+
 import { Inter } from "next/font/google";
 import { ConfigProvider } from "antd";
 import { AuthProvider } from "@/contexts/AuthContext";
@@ -8,28 +9,25 @@ import { SearchProvider } from "@/contexts/SearchContext";
 import GlobalBackground from "@/contexts/BackgroundGradient";
 import "./globals.css";
 import Navbar from "@/components/layout/Navbar";
+import { usePathname } from "next/navigation";
 
 import ChatbotWidget from "@/components/chatbot/ChatbotWidget";
 
 const inter = Inter({ subsets: ["latin"] });
-
-export const metadata: Metadata = {
-  title: "Emox - E-commerce Platform",
-  description:
-    "Complete e-commerce platform with authentication and theme support",
-};
 
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const pathname = usePathname();
+  const isAdminRoute = pathname?.startsWith("/admin");
+
   return (
     <html lang="en" suppressHydrationWarning>
       <body
         className={`${inter.className} relative min-h-screen`}
-        suppressHydrationWarning
-      >
+        suppressHydrationWarning>
         <ThemeProvider>
           <SettingsProvider>
             <SearchProvider>
@@ -42,8 +40,9 @@ export default function RootLayout({
                 }}
               >
                 <AuthProvider>
-                  <Navbar />
-                  <ChatbotWidget />
+                  {/* Hide navbar on admin routes */}
+                  {!isAdminRoute && <Navbar />}
+                  {!isAdminRoute && <ChatbotWidget />}
                   {/* 🌈 Background shown below everything */}
                   <GlobalBackground />
 
